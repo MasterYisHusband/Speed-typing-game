@@ -22,6 +22,7 @@ function startGame() {
       isRunning.value = false
       wpm.value = userInput.value.split(' ').length / 0.5
       timeLeft.value = 30
+      userInput.value = ''
     }
   }, 1000)
 }

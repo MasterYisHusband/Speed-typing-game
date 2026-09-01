@@ -4,6 +4,27 @@ import { ref } from 'vue'
 const text: string = 'Hello'
 
 const userInput = ref('')
+
+const wpm = ref(0)
+
+const isRunning = ref(false)
+
+const timeLeft = ref(30)
+
+function startGame() {
+  isRunning.value = true
+
+  const timer = setInterval(() => {
+    timeLeft.value--
+
+    if (timeLeft.value === 0) {
+      clearInterval(timer)
+      isRunning.value = false
+      wpm.value = userInput.value.split(' ').length / 0.5
+      timeLeft.value = 30
+    }
+  }, 1000)
+}
 </script>
 
 <template>
@@ -17,8 +38,14 @@ const userInput = ref('')
     >
   </div>
 
-  <input v-model="userInput" />
-  <p>{{ userInput }}</p>
+  <input v-model="userInput" :disabled="!isRunning" />
+
+  <button @click="startGame">START</button>
+  <div>
+    {{ timeLeft }}
+  </div>
+
+  <p>{{ wpm }}</p>
 </template>
 
 <style>

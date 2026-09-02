@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
+const selectedDifficulty = ref('easy')
 
 const text: string = 'Hallo'
 
@@ -17,6 +19,7 @@ function startGame() {
   if (isRunning.value === true) {
     return
   }
+  wpm.value = 0
   isRunning.value = true
 
   const timer = setInterval(() => {
@@ -31,6 +34,12 @@ function startGame() {
     }
   }, 1000)
 }
+
+const testDuration = computed(() => {
+  if (selectedDifficulty.value === 'easy') {
+    return 180
+  }
+})
 </script>
 
 <!-- Template -->

@@ -30,6 +30,7 @@ async function getRandomWord() {
   const data = await response.json()
   currentWord.value = data[0]
 }
+getRandomWord()
 
 function checkWord() {
   if (currentWord.value === userInput.value) {

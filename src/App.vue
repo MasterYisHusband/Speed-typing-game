@@ -11,6 +11,8 @@ const wordsTyped = ref(0)
 
 const wpm = ref(0)
 
+const timer = ref()
+
 const isRunning = ref(false)
 
 const history = ref<number[]>([])
@@ -49,10 +51,10 @@ function startGame() {
   isRunning.value = true
   timeLeft.value = testDuration.value
 
-  const timer = setInterval(() => {
+  timer.value = setInterval(() => {
     timeLeft.value--
     if (timeLeft.value === 0) {
-      clearInterval(timer)
+      clearInterval(timer.value)
       isRunning.value = false
       wpm.value = wordsTyped.value / (testDuration.value / 60)
       history.value.push(wpm.value)
@@ -60,6 +62,15 @@ function startGame() {
       userInput.value = ''
     }
   }, 1000)
+}
+
+function endGame() {
+  clearInterval(timer.value)
+  isRunning.value = false
+  wpm.value = wordsTyped.value / (testDuration.value / 60)
+  history.value.push(wpm.value)
+  timeLeft.value = testDuration.value
+  userInput.value = ''
 }
 
 const testDuration = computed(() => {

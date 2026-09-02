@@ -1,35 +1,52 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const selectedDifficulty = ref('easy')
 
-const text: string = 'Hallo'
+const currentWord = ref('')
 
 const userInput = ref('')
+
+const wordsTyped = ref(0)
 
 const wpm = ref(0)
 
 const isRunning = ref(false)
 
-const timeLeft = ref(30)
-
 const history = ref<number[]>([])
+
+async function getRandomWord() {
+  const response = await fetch('https://random-word-api.herokuapp.com/word')
+  const data = await response.json()
+  currentWord.value = data[0]
+}
+getRandomWord()
+
+function checkWord() {
+  if (currentWord.value === userInput.value) {
+    wordsTyped.value++
+    getRandomWord()
+    userInput.value = ''
+  }
+}
 
 function startGame() {
   if (isRunning.value === true) {
     return
   }
   wpm.value = 0
+  wordsTyped.value = 0
   isRunning.value = true
+  timeLeft.value = testDuration.value
 
   const timer = setInterval(() => {
     timeLeft.value--
     if (timeLeft.value === 0) {
       clearInterval(timer)
       isRunning.value = false
-      wpm.value = userInput.value.split(' ').length / (30 / 60)
+      wpm.value = wordsTyped.value / (testDuration.value / 60)
       history.value.push(wpm.value)
-      timeLeft.value = 30
+      timeLeft.value = testDuration.value
       userInput.value = ''
     }
   }, 1000)
@@ -38,23 +55,31 @@ function startGame() {
 const testDuration = computed(() => {
   if (selectedDifficulty.value === 'easy') {
     return 180
+  } else if (selectedDifficulty.value === 'medium') {
+    return 120
+  } else {
+    return 60
   }
 })
+
+const timeLeft = ref(testDuration.value)
 </script>
 
 <!-- Template -->
 <template>
-  <div v-for="(character, index) in text.split('')">
+  <p>{{ currentWord }}</p>
+
+  <div v-for="(character, index) in currentWord.split('')">
     <span
       :class="{
-        correct: text[index] === userInput[index],
-        wrong: userInput[index] !== undefined && text[index] !== userInput[index],
+        correct: currentWord[index] === userInput[index],
+        wrong: userInput[index] !== undefined && currentWord[index] !== userInput[index],
       }"
       >{{ character }}</span
     >
   </div>
 
-  <input v-model="userInput" :disabled="!isRunning" />
+  <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
 
   <button @click="startGame">START</button>
   <div>
@@ -64,6 +89,10 @@ const testDuration = computed(() => {
   <div>
     <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
   </div>
+
+  <button @click="selectedDifficulty = 'easy'">Easy</button>
+  <button @click="selectedDifficulty = 'medium'">Medium</button>
+  <button @click="selectedDifficulty = 'difficult'">Difficult</button>
 </template>
 
 <!-- CSS -->

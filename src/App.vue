@@ -16,11 +16,20 @@ const isRunning = ref(false)
 const history = ref<number[]>([])
 
 async function getRandomWord() {
-  const response = await fetch('https://random-word-api.herokuapp.com/word')
+  let wordLength = 5
+
+  if (selectedDifficulty.value === 'medium') {
+    wordLength = 7
+  }
+
+  if (selectedDifficulty.value === 'difficult') {
+    wordLength = 10
+  }
+
+  const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
   const data = await response.json()
   currentWord.value = data[0]
 }
-getRandomWord()
 
 function checkWord() {
   if (currentWord.value === userInput.value) {

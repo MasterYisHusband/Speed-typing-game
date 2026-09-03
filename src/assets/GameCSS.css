@@ -1,7 +1,5 @@
 :root {
-    --correct-word: green;
+  --correct-word: green;
 
-    --false-word: red;
-
-    --halfright-word: orange;
+  --wrong-word: red;
 }

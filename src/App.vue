@@ -125,12 +125,12 @@ const timeLeft = ref(testDuration.value)
 </template>
 
 <!-- CSS -->
-<style>
+<style scoped>
 .correct {
-  color: green;
+  color: var(--correct-word);
 }
 
 .wrong {
-  color: red;
+  color: var(--wrong-word);
 }
 </style>

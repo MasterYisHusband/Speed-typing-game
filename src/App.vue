@@ -67,7 +67,7 @@ function startGame() {
 function endGame() {
   clearInterval(timer.value)
   isRunning.value = false
-  wpm.value = wordsTyped.value / (testDuration.value / 60)
+  wpm.value = wordsTyped.value / ((testDuration.value - timeLeft.value) / 60)
   history.value.push(wpm.value)
   timeLeft.value = testDuration.value
   userInput.value = ''

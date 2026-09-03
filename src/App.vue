@@ -19,29 +19,38 @@ const {
 
 <template>
   <div class="game">
-    <p>{{ currentWord }}</p>
+    <div class="game-area">
+      <p>{{ currentWord }}</p>
 
-    <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
+      <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
 
-    <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
+      <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
 
-    <button @click="startGame">START</button>
-    <button @click="endGame" :disabled="!isRunning">STOP</button>
-
-    <TimerDisplay :time-left="timeLeft"></TimerDisplay>
-
-    <div>
-      <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
+      <button @click="startGame">START</button>
+      <button @click="endGame" :disabled="!isRunning">STOP</button>
     </div>
+    <div class="stats">
+      <TimerDisplay :time-left="timeLeft"></TimerDisplay>
 
-    <DifficultySelector v-model="selectedDifficulty"></DifficultySelector>
+      <div>
+        <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
+      </div>
+    </div>
+    <div class="difficulty">
+      <DifficultySelector v-model="selectedDifficulty"></DifficultySelector>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .game {
-  display: flex;
+  display: grid;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
+  height: 100vh;
+  width: 100%;
+  background-color: lightblue;
 }
 </style>

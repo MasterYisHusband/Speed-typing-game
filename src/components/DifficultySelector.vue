@@ -6,10 +6,17 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:modelValue', difficulty: string): void
 }>()
+
+function changeDifficulty(event: Event) {
+  const target = event.target as HTMLSelectElement
+  emit('update:modelValue', target.value)
+}
 </script>
 
 <template>
-  <button @click="emit('update:modelValue', 'easy')">Easy</button>
-  <button @click="emit('update:modelValue', 'medium')">Medium</button>
-  <button @click="emit('update:modelValue', 'difficult')">Difficult</button>
+  <select :value="props.modelValue" @change="changeDifficulty">
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="difficult">Difficult</option>
+  </select>
 </template>

@@ -71,6 +71,7 @@ function endGame() {
   history.value.push(wpm.value)
   timeLeft.value = testDuration.value
   userInput.value = ''
+  getRandomWord()
 }
 
 watch(selectedDifficulty, () => {

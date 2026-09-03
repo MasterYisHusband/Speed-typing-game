@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import DifficultySelector from './components/DifficultySelector.vue'
+import CharacterDisplay from './components/CharacterDisplay.vue'
+import TimeDisplay from './components/TimerDisplay.vue'
 
 const selectedDifficulty = ref('easy')
 
@@ -99,23 +101,14 @@ const timeLeft = ref(testDuration.value)
 <template>
   <p>{{ currentWord }}</p>
 
-  <div v-for="(character, index) in currentWord.split('')">
-    <span
-      :class="{
-        correct: currentWord[index] === userInput[index],
-        wrong: userInput[index] !== undefined && currentWord[index] !== userInput[index],
-      }"
-      >{{ character }}</span
-    >
-  </div>
+  <CharacterDisplay :currentWord="currentWord" :userInput="userInput"></CharacterDisplay>
 
   <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
 
   <button @click="startGame">START</button>
   <button @click="endGame" :disabled="!isRunning">STOP</button>
-  <div>
-    {{ timeLeft }}
-  </div>
+
+  <TimerDisplay :timeLeft="timeLeft"></TimerDisplay>
 
   <div>
     <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
@@ -126,14 +119,3 @@ const timeLeft = ref(testDuration.value)
     @difficultyChange="selectedDifficulty = $event"
   />
 </template>
-
-<!-- CSS -->
-<style scoped>
-.correct {
-  color: var(--correct-word);
-}
-
-.wrong {
-  color: var(--wrong-word);
-}
-</style>

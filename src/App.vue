@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, version } from 'vue'
+import DifficultySelector from './components/DifficultySelector.vue'
 
 const selectedDifficulty = ref('easy')
 
@@ -120,9 +121,7 @@ const timeLeft = ref(testDuration.value)
     <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
   </div>
 
-  <button @click="selectedDifficulty = 'easy'">Easy</button>
-  <button @click="selectedDifficulty = 'medium'">Medium</button>
-  <button @click="selectedDifficulty = 'difficult'">Difficult</button>
+  <DifficultySelector />
 </template>
 
 <!-- CSS -->

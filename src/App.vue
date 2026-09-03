@@ -1,121 +1,47 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
 import DifficultySelector from './components/DifficultySelector.vue'
 import CharacterDisplay from './components/CharacterDisplay.vue'
-import TimeDisplay from './components/TimerDisplay.vue'
+import TimerDisplay from './components/TimerDisplay.vue'
+import { useTypingGame } from './components/composables/useTypingGame.ts'
 
-const selectedDifficulty = ref('easy')
-
-const currentWord = ref('')
-
-const userInput = ref('')
-
-const wordsTyped = ref(0)
-
-const wpm = ref(0)
-
-const timer = ref()
-
-const isRunning = ref(false)
-
-const history = ref<number[]>([])
-
-async function getRandomWord() {
-  let wordLength = 5
-
-  if (selectedDifficulty.value === 'medium') {
-    wordLength = 7
-  }
-
-  if (selectedDifficulty.value === 'difficult') {
-    wordLength = 10
-  }
-
-  const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
-  const data = await response.json()
-  currentWord.value = data[0]
-}
-getRandomWord()
-
-function checkWord() {
-  if (currentWord.value === userInput.value) {
-    wordsTyped.value++
-    getRandomWord()
-    userInput.value = ''
-  }
-}
-
-function startGame() {
-  if (isRunning.value === true) {
-    return
-  }
-  wpm.value = 0
-  wordsTyped.value = 0
-  isRunning.value = true
-  timeLeft.value = testDuration.value
-
-  timer.value = setInterval(() => {
-    timeLeft.value--
-    if (timeLeft.value === 0) {
-      clearInterval(timer.value)
-      isRunning.value = false
-      wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
-      history.value.push(wpm.value)
-      timeLeft.value = testDuration.value
-      userInput.value = ''
-    }
-  }, 1000)
-}
-
-function endGame() {
-  clearInterval(timer.value)
-  isRunning.value = false
-  wpm.value = Math.ceil(wordsTyped.value / ((testDuration.value - timeLeft.value) / 60))
-  history.value.push(wpm.value)
-  timeLeft.value = testDuration.value
-  userInput.value = ''
-  getRandomWord()
-}
-
-watch(selectedDifficulty, () => {
-  if (isRunning.value === false) {
-    timeLeft.value = testDuration.value
-    getRandomWord()
-  }
-})
-
-const testDuration = computed(() => {
-  if (selectedDifficulty.value === 'easy') {
-    return 180
-  } else if (selectedDifficulty.value === 'medium') {
-    return 120
-  } else {
-    return 60
-  }
-})
-
-const timeLeft = ref(testDuration.value)
+const {
+  currentWord,
+  userInput,
+  isRunning,
+  history,
+  selectedDifficulty,
+  checkWord,
+  timeLeft,
+  startGame,
+  endGame,
+} = useTypingGame()
 </script>
 
-<!-- Template -->
 <template>
-  <p>{{ currentWord }}</p>
+  <div class="game">
+    <p>{{ currentWord }}</p>
 
-  <CharacterDisplay :currentWord="currentWord" :userInput="userInput"></CharacterDisplay>
+    <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
 
-  <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
+    <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
 
-  <button @click="startGame">START</button>
-  <button @click="endGame" :disabled="!isRunning">STOP</button>
+    <button @click="startGame">START</button>
+    <button @click="endGame" :disabled="!isRunning">STOP</button>
 
-  <TimerDisplay :timeLeft="timeLeft"></TimerDisplay>
+    <TimerDisplay :time-left="timeLeft"></TimerDisplay>
 
-  <div>
-    <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
+    <div>
+      <p v-for="(character, index) in history">Round {{ index + 1 }}: {{ character }} WPM</p>
+    </div>
+
+    <DifficultySelector v-model="selectedDifficulty"></DifficultySelector>
   </div>
-
-  <DifficultySelector
-    :difficulty="selectedDifficulty"
-    @difficultyChange="selectedDifficulty = $event"
-  />
 </template>
+
+<style scoped>
+.game {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+</style>

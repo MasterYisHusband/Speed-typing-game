@@ -20,3 +20,12 @@ function changeDifficulty(event: Event) {
     <option value="difficult">Difficult</option>
   </select>
 </template>
+
+<style scoped>
+select {
+  width: 250px;
+  height: 45px;
+  font-size: 18px;
+  padding: 0 10px;
+}
+</style>

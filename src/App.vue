@@ -103,6 +103,7 @@ const timeLeft = ref(testDuration.value)
   <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
 
   <button @click="startGame">START</button>
+  <button @click="endGame" :disabled="!isRunning">STOP</button>
   <div>
     {{ timeLeft }}
   </div>

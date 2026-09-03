@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, version } from 'vue'
 
 const selectedDifficulty = ref('easy')
 
@@ -56,7 +56,7 @@ function startGame() {
     if (timeLeft.value === 0) {
       clearInterval(timer.value)
       isRunning.value = false
-      wpm.value = wordsTyped.value / (testDuration.value / 60)
+      wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
       history.value.push(wpm.value)
       timeLeft.value = testDuration.value
       userInput.value = ''
@@ -67,11 +67,18 @@ function startGame() {
 function endGame() {
   clearInterval(timer.value)
   isRunning.value = false
-  wpm.value = wordsTyped.value / ((testDuration.value - timeLeft.value) / 60)
+  wpm.value = Math.ceil(wordsTyped.value / ((testDuration.value - timeLeft.value) / 60))
   history.value.push(wpm.value)
   timeLeft.value = testDuration.value
   userInput.value = ''
 }
+
+watch(selectedDifficulty, () => {
+  if (isRunning.value === false) {
+    timeLeft.value = testDuration.value
+    getRandomWord()
+  }
+})
 
 const testDuration = computed(() => {
   if (selectedDifficulty.value === 'easy') {

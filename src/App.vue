@@ -14,6 +14,7 @@ const {
   timeLeft,
   startGame,
   endGame,
+  accuracy,
 } = useTypingGame()
 </script>
 
@@ -33,11 +34,16 @@ const {
         <h3>Timer:</h3>
         <TimerDisplay :time-left="timeLeft"></TimerDisplay>
       </div>
+      <div class="accuracy">
+        <h3>Accuracy</h3>
+        <span>{{ accuracy }}%</span>
+      </div>
       <div>
         <div class="history">
-          <div v-for="(WPM, index) in history" :key="index" class="history-entry">
+          <div v-for="(Round, index) in history" :key="index" class="history-entry">
             <span>Round {{ index + 1 }}</span>
-            <span>{{ WPM }} WPM</span>
+            <span>{{ Round.wpm }} WPM</span>
+            <span>{{ Round.accuracy }}% Accuracy</span>
           </div>
         </div>
       </div>
@@ -133,7 +139,7 @@ const {
   justify-content: space-between;
   gap: 30px;
   padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 2px solid red;
 }
 </style>

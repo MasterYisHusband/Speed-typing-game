@@ -1,3 +1,4 @@
+import { isPropertyAccessOrQualifiedName } from 'typescript'
 import { ref, computed, watch } from 'vue'
 
 export function useTypingGame() {
@@ -5,10 +6,13 @@ export function useTypingGame() {
   const userInput = ref('')
   const wordsTyped = ref(0)
   const wpm = ref(0)
+  const accuracy = ref(0)
   const timer = ref()
   const isRunning = ref(false)
-  const history = ref<number[]>([])
+  const history = ref<{ wpm: number; accuracy: number }[]>([])
   const selectedDifficulty = ref('easy')
+  const correctCharacters = ref(0)
+  const totalCharacters = ref(0)
 
   async function getRandomWord() {
     let wordLength = 5
@@ -28,11 +32,30 @@ export function useTypingGame() {
   getRandomWord()
 
   function checkWord() {
+    const input = userInput.value
+    if (input.length > totalCharacters.value % currentWord.value.length) {
+      const index = input.length - 1
+      const typedCharacter = input[index]
+      const correctCharacter = currentWord.value[index]
+      totalCharacters.value++
+      if (typedCharacter === correctCharacter) {
+        correctCharacters.value++
+      }
+    }
     if (currentWord.value === userInput.value) {
       wordsTyped.value++
       getRandomWord()
       userInput.value = ''
     }
+    updateAccuracy()
+  }
+
+  function updateAccuracy() {
+    if (totalCharacters.value === 0) {
+      accuracy.value = 0
+      return
+    }
+    accuracy.value = Math.round((correctCharacters.value / totalCharacters.value) * 100)
   }
 
   const testDuration = computed(() => {
@@ -53,6 +76,9 @@ export function useTypingGame() {
     }
     wpm.value = 0
     wordsTyped.value = 0
+    accuracy.value = 0
+    correctCharacters.value = 0
+    totalCharacters.value = 0
     isRunning.value = true
     timeLeft.value = testDuration.value
 
@@ -62,7 +88,10 @@ export function useTypingGame() {
         clearInterval(timer.value)
         isRunning.value = false
         wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
-        history.value.push(wpm.value)
+
+        updateAccuracy()
+
+        history.value.push({ wpm: wpm.value, accuracy: accuracy.value })
         timeLeft.value = testDuration.value
         userInput.value = ''
       }
@@ -79,8 +108,15 @@ export function useTypingGame() {
   function endGame() {
     clearInterval(timer.value)
     isRunning.value = false
-    wpm.value = Math.ceil(wordsTyped.value / ((testDuration.value - timeLeft.value) / 60))
-    history.value.push(wpm.value)
+    const elapsedTime = testDuration.value - timeLeft.value
+    if (elapsedTime > 0) {
+      wpm.value = Math.ceil(wordsTyped.value / (elapsedTime / 60))
+    } else {
+      wpm.value = 0
+    }
+    updateAccuracy()
+
+    history.value.push({ wpm: wpm.value, accuracy: accuracy.value })
     timeLeft.value = testDuration.value
     userInput.value = ''
     getRandomWord()
@@ -96,5 +132,6 @@ export function useTypingGame() {
     timeLeft,
     startGame,
     endGame,
+    accuracy,
   }
 }

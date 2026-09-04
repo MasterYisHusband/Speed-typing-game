@@ -28,13 +28,16 @@ const {
       <button @click="endGame" :disabled="!isRunning">STOP</button>
     </div>
     <div class="stats">
-      <TimerDisplay :time-left="timeLeft"></TimerDisplay>
-
+      <h2>Stats</h2>
+      <div class="timer">
+        <h3>Timer:</h3>
+        <TimerDisplay :time-left="timeLeft"></TimerDisplay>
+      </div>
       <div>
         <div class="history">
-          <div v-for="(character, index) in history" class="history-entry">
+          <div v-for="(WPM, index) in history" :key="index" class="history-entry">
             <span>Round {{ index + 1 }}</span>
-            <span>{{ character }} WPM</span>
+            <span>{{ WPM }} WPM</span>
           </div>
         </div>
       </div>
@@ -84,7 +87,7 @@ const {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 20px;
 
   background-color: whitesmoke;
@@ -93,6 +96,21 @@ const {
   margin: 20px;
   color: black;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stats h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.timer {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  text-align: center;
+  background-color: white;
 }
 
 .difficulty {
@@ -107,9 +125,13 @@ const {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
-.history p {
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
   padding: 10px 15px;
   border-radius: 8px;
   border: 2px solid red;

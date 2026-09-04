@@ -109,6 +109,13 @@ const {
   font-size: 28px;
 }
 
+.accuracy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .timer {
   width: 100%;
   box-sizing: border-box;

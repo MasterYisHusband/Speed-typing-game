@@ -19,13 +19,14 @@ const {
   difficultyselected,
   streak,
   correctFeedback,
+  shakeFeedback,
 } = useTypingGame()
 </script>
 
 <template>
   <div class="game">
     <div class="game-area">
-      <div class="word-display">
+      <div class="word-display" :class="{ shake: shakeFeedback }">
         <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
         <div v-if="correctFeedback" class="correct-feedback">✓</div>
       </div>
@@ -203,5 +204,35 @@ const {
   font-weight: bold;
   position: absolute;
   right: -30px;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-10px);
+  }
+
+  40% {
+    transform: translateX(10px);
+  }
+
+  60% {
+    transform: translateX(-10px);
+  }
+
+  80% {
+    transform: translateX(10px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.shake {
+  animation: shake 500ms;
 }
 </style>

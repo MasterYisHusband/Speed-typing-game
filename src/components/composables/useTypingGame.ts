@@ -16,6 +16,7 @@ export function useTypingGame() {
   const totalCharacters = ref(0)
   const streak = ref(0)
   const correctFeedback = ref(false)
+  const shakeFeedback = ref(false)
 
   async function getRandomWord() {
     let wordLength = 5
@@ -45,6 +46,10 @@ export function useTypingGame() {
         correctCharacters.value++
       } else {
         streak.value = 0
+        shakeFeedback.value = true
+        setTimeout(() => {
+          shakeFeedback.value = false
+        }, 500)
       }
     }
     if (currentWord.value === userInput.value) {
@@ -158,5 +163,6 @@ export function useTypingGame() {
     difficultyselected,
     streak,
     correctFeedback,
+    shakeFeedback,
   }
 }

@@ -14,6 +14,8 @@ export function useTypingGame() {
   const selectedDifficulty = ref('easy')
   const correctCharacters = ref(0)
   const totalCharacters = ref(0)
+  const streak = ref(0)
+  const correctFeedback = ref(false)
 
   async function getRandomWord() {
     let wordLength = 5
@@ -41,10 +43,17 @@ export function useTypingGame() {
       totalCharacters.value++
       if (typedCharacter === correctCharacter) {
         correctCharacters.value++
+      } else {
+        streak.value = 0
       }
     }
     if (currentWord.value === userInput.value) {
       wordsTyped.value++
+      streak.value++
+      correctFeedback.value = true
+      setTimeout(() => {
+        correctFeedback.value = false
+      }, 500)
       getRandomWord()
       userInput.value = ''
     }
@@ -80,6 +89,7 @@ export function useTypingGame() {
     accuracy.value = 0
     correctCharacters.value = 0
     totalCharacters.value = 0
+    streak.value = 0
     isRunning.value = true
     timeLeft.value = testDuration.value
 
@@ -146,5 +156,7 @@ export function useTypingGame() {
     endGame,
     accuracy,
     difficultyselected,
+    streak,
+    correctFeedback,
   }
 }

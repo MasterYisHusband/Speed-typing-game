@@ -3,6 +3,7 @@ import DifficultySelector from './components/DifficultySelector.vue'
 import CharacterDisplay from './components/CharacterDisplay.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { useTypingGame } from './components/composables/useTypingGame.ts'
+import { convertCompilerOptionsFromJson, createModuleResolutionCache } from 'typescript'
 
 const {
   currentWord,
@@ -16,18 +17,24 @@ const {
   endGame,
   accuracy,
   difficultyselected,
+  streak,
+  correctFeedback,
 } = useTypingGame()
 </script>
 
 <template>
   <div class="game">
     <div class="game-area">
-      <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
-
+      <div class="word-display">
+        <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
+        <div v-if="correctFeedback" class="correct-feedback">✓</div>
+      </div>
       <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
-
-      <button @click="startGame">START</button>
-      <button @click="endGame" :disabled="!isRunning">STOP</button>
+      <div class="buttons">
+        <button @click="startGame">START</button>
+        <button @click="endGame" :disabled="!isRunning">STOP</button>
+      </div>
+      <div class="streak">{{ streak }}</div>
     </div>
     <div class="stats">
       <h2>Stats</h2>
@@ -166,5 +173,35 @@ const {
   padding: 10px 15px;
   border-radius: 10px;
   border: 2px solid red;
+}
+
+.word-display {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+}
+
+@keyframes correct-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.correct-feedback {
+  animation: correct-pop 1000ms;
+  color: var(--correct-word);
+  font-weight: bold;
+  position: absolute;
+  right: -30px;
 }
 </style>

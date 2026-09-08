@@ -102,6 +102,7 @@ export function useTypingGame() {
   watch(selectedDifficulty, () => {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
+      history.value = []
       getRandomWord()
     }
   })

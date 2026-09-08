@@ -106,6 +106,9 @@ const {
   margin: 20px;
   color: black;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+  min-height: 0;
+  overflow: hidden;
 }
 
 .stats h2 {
@@ -151,6 +154,9 @@ const {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  max-height: 700px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 .history-entry {

@@ -2,4 +2,10 @@
   --correct-word: green;
 
   --wrong-word: red;
+
+  --easy-difficulty: lightgreen;
+
+  --medium-difficulty: orange;
+
+  --difficult-difficulty: red;
 }

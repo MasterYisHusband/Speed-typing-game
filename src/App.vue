@@ -15,6 +15,7 @@ const {
   startGame,
   endGame,
   accuracy,
+  difficultyselected,
 } = useTypingGame()
 </script>
 
@@ -33,6 +34,9 @@ const {
       <div class="timer">
         <h3>Timer:</h3>
         <TimerDisplay :time-left="timeLeft"></TimerDisplay>
+      </div>
+      <div class="difficultyselected" :style="{ color: `var(${difficultyselected})` }">
+        <h2>{{ selectedDifficulty }}</h2>
       </div>
       <div class="accuracy">
         <h3>Accuracy</h3>
@@ -132,6 +136,14 @@ const {
   justify-content: center;
   align-items: center;
   padding-bottom: 15px;
+}
+
+.difficultyselected h2 {
+  display: grid;
+  grid-area: inherit;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
 }
 
 .history {

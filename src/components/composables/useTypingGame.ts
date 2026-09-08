@@ -1,5 +1,6 @@
 import { isPropertyAccessOrQualifiedName } from 'typescript'
 import { ref, computed, watch } from 'vue'
+import { compileScript } from 'vue/compiler-sfc'
 
 export function useTypingGame() {
   const currentWord = ref('')
@@ -105,6 +106,16 @@ export function useTypingGame() {
     }
   })
 
+  const difficultyselected = computed(() => {
+    if (selectedDifficulty.value === 'easy') {
+      return '--easy-difficulty'
+    } else if (selectedDifficulty.value === 'medium') {
+      return '--medium-difficulty'
+    } else {
+      return '--difficult-difficulty'
+    }
+  })
+
   function endGame() {
     clearInterval(timer.value)
     isRunning.value = false
@@ -133,5 +144,6 @@ export function useTypingGame() {
     startGame,
     endGame,
     accuracy,
+    difficultyselected,
   }
 }

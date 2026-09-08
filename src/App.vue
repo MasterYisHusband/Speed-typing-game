@@ -4,6 +4,7 @@ import CharacterDisplay from './components/CharacterDisplay.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { useTypingGame } from './components/composables/useTypingGame.ts'
 import { convertCompilerOptionsFromJson, createModuleResolutionCache } from 'typescript'
+import { PhFire } from '@phosphor-icons/vue'
 
 const {
   currentWord,
@@ -35,7 +36,7 @@ const {
         <button @click="startGame">START</button>
         <button @click="endGame" :disabled="!isRunning">STOP</button>
       </div>
-      <div class="streak">{{ streak }}</div>
+      <div class="streak"><PhFire class="icon" /> {{ streak }}</div>
     </div>
     <div class="stats">
       <h2>Stats</h2>
@@ -122,6 +123,7 @@ const {
 .stats h2 {
   margin: 0;
   font-size: 28px;
+  font-weight: bold;
 }
 
 .accuracy {
@@ -234,5 +236,13 @@ const {
 
 .shake {
   animation: shake 500ms;
+}
+
+.streak {
+  font-size: 25px;
+}
+
+.icon {
+  color: orange;
 }
 </style>

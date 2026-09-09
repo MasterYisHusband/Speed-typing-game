@@ -23,6 +23,7 @@ const {
   countdown,
   highscore,
   fireSize,
+  typingInput,
 } = useTypingGame()
 
 //localStorage.setItem('test', JSON.stringify(1 + 1))

@@ -191,6 +191,16 @@ export function useTypingGame() {
   }
   highscore.value = highscores.value[selectedDifficulty.value]
 
+  const fireSize = computed(() => {
+    if (streak.value >= 10) {
+      return 'fill'
+    } else if (streak.value >= 5) {
+      return 'bold'
+    } else {
+      return 'light'
+    }
+  })
+
   return {
     currentWord,
     userInput,
@@ -210,5 +220,6 @@ export function useTypingGame() {
     typingInput,
     countdown,
     highscore,
+    fireSize,
   }
 }

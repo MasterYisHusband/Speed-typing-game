@@ -24,6 +24,7 @@ const {
   countdown,
   typingInput,
   highscore,
+  fireSize,
 } = useTypingGame()
 
 //localStorage.setItem('test', JSON.stringify(1 + 1))
@@ -42,8 +43,9 @@ const {
       <div class="buttons">
         <button @click="startGame">START</button>
         <button @click="endGame" :disabled="!isRunning">STOP</button>
+        <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
       </div>
-      <div class="streak"><PhFire class="icon" /> {{ streak }}</div>
+      <div class="streak"><PhFire class="icon" :size="30" :weight="fireSize" /> {{ streak }}</div>
     </div>
     <div class="stats">
       <h2>Stats</h2>
@@ -152,6 +154,20 @@ const {
   border-radius: 10px;
   text-align: center;
   background-color: white;
+}
+
+.countdown {
+  font-size: 30px;
+  font-weight: bold;
+  position: absolute;
+  right: -30px;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
 }
 
 .difficulty {

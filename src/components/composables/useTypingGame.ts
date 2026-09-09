@@ -1,6 +1,4 @@
-import { isPropertyAccessOrQualifiedName } from 'typescript'
 import { ref, computed, watch, nextTick } from 'vue'
-import { compileScript } from 'vue/compiler-sfc'
 
 export function useTypingGame() {
   const currentWord = ref('')

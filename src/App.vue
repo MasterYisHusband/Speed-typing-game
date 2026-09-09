@@ -3,7 +3,6 @@ import DifficultySelector from './components/DifficultySelector.vue'
 import CharacterDisplay from './components/CharacterDisplay.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { useTypingGame } from './components/composables/useTypingGame.ts'
-import { convertCompilerOptionsFromJson, createModuleResolutionCache } from 'typescript'
 import { PhFire } from '@phosphor-icons/vue'
 
 const {
@@ -22,7 +21,6 @@ const {
   correctFeedback,
   shakeFeedback,
   countdown,
-  typingInput,
   highscore,
   fireSize,
 } = useTypingGame()
@@ -30,6 +28,7 @@ const {
 //localStorage.setItem('test', JSON.stringify(1 + 1))
 //const wert = JSON.parse(localStorage.getItem('test')!)
 //console.log('LocalStorage-Wert, ' + wert)
+//CUB Software Placeholder Text API (für Texte)
 </script>
 
 <template>

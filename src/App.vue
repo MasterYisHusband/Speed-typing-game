@@ -58,10 +58,8 @@ const {
       <div class="accuracy">
         <h3>Accuracy</h3>
         <span>{{ accuracy }}%</span>
-        <div class="highscore">
-          <h3>Highscore</h3>
-          <span>{{ highscore }}</span>
-        </div>
+        <h3>Highscore</h3>
+        <span>{{ highscore }}</span>
       </div>
       <div>
         <div class="history">
@@ -140,9 +138,10 @@ const {
 
 .accuracy {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .timer {

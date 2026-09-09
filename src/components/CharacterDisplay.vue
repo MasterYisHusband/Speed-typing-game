@@ -17,6 +17,7 @@ const props = defineProps<{
         }"
         >{{ character }}</span
       >
+      <div v-if="index === props.userInput.length" class="arrow">↑</div>
     </div>
   </div>
 </template>
@@ -26,6 +27,12 @@ const props = defineProps<{
   display: flex;
   gap: 5px;
   font-size: 30px;
+  position: relative;
+}
+
+.arrow {
+  font-size: large;
+  height: 10px;
 }
 
 select {

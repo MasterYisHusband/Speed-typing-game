@@ -24,6 +24,8 @@ export function useTypingGame() {
     medium: 0,
     difficult: 0,
   })
+  const wrongLetterSound = new Audio('public/sounds/wrong.mp3')
+  const wrongWordSound = new Audio('public/sounds/wrong.mp3')
 
   async function getRandomWord() {
     let wordLength = 5
@@ -54,6 +56,7 @@ export function useTypingGame() {
       } else {
         streak.value = 0
         shakeFeedback.value = true
+        wrongLetterSound.play()
         setTimeout(() => {
           shakeFeedback.value = false
         }, 500)
@@ -62,6 +65,7 @@ export function useTypingGame() {
     if (currentWord.value === userInput.value) {
       wordsTyped.value++
       streak.value++
+
       if (streak.value > highscore.value) {
         highscore.value = streak.value
         highscores.value[selectedDifficulty.value] = streak.value
@@ -74,6 +78,14 @@ export function useTypingGame() {
       getRandomWord()
       userInput.value = ''
     }
+
+    if (
+      userInput.value.length === currentWord.value.length &&
+      currentWord.value !== userInput.value
+    ) {
+      wrongWordSound.play()
+    }
+
     updateAccuracy()
   }
 

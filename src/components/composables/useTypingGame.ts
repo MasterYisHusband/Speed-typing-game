@@ -13,7 +13,7 @@ export function useTypingGame() {
   const countdown = ref(0)
   const isRunning = ref(false)
   const history = ref<{ wpm: number; accuracy: number }[]>([])
-  const selectedDifficulty = ref('easy')
+  const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')
   const correctCharacters = ref(0)
   const totalCharacters = ref(0)
   const streak = ref(0)
@@ -21,6 +21,11 @@ export function useTypingGame() {
   const shakeFeedback = ref(false)
   const typingInput = ref()
   const highscore = ref(0)
+  const highscores = ref({
+    easy: 0,
+    medium: 0,
+    difficult: 0,
+  })
 
   async function getRandomWord() {
     let wordLength = 5
@@ -61,7 +66,8 @@ export function useTypingGame() {
       streak.value++
       if (streak.value > highscore.value) {
         highscore.value = streak.value
-        localStorage.setItem('highscore', JSON.stringify(highscore.value))
+        highscores.value[selectedDifficulty.value] = streak.value
+        localStorage.setItem('highscores', JSON.stringify(highscores.value))
       }
       correctFeedback.value = true
       setTimeout(() => {
@@ -147,6 +153,7 @@ export function useTypingGame() {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
       history.value = []
+      highscore.value = highscores.value[selectedDifficulty.value]
       getRandomWord()
     }
   })
@@ -178,10 +185,11 @@ export function useTypingGame() {
     getRandomWord()
   }
 
-  const savedHighscore = localStorage.getItem('highscore')
-  if (savedHighscore !== null) {
-    highscore.value = JSON.parse(savedHighscore)
+  const savedHighscores = localStorage.getItem('highscores')
+  if (savedHighscores !== null) {
+    highscores.value = JSON.parse(savedHighscores)
   }
+  highscore.value = highscores.value[selectedDifficulty.value]
 
   return {
     currentWord,

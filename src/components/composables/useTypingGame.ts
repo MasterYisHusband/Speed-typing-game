@@ -20,6 +20,7 @@ export function useTypingGame() {
   const correctFeedback = ref(false)
   const shakeFeedback = ref(false)
   const typingInput = ref()
+  const highscore = ref(0)
 
   async function getRandomWord() {
     let wordLength = 5
@@ -58,6 +59,10 @@ export function useTypingGame() {
     if (currentWord.value === userInput.value) {
       wordsTyped.value++
       streak.value++
+      if (streak.value > highscore.value) {
+        highscore.value = streak.value
+        localStorage.setItem('highscore', JSON.stringify(highscore.value))
+      }
       correctFeedback.value = true
       setTimeout(() => {
         correctFeedback.value = false
@@ -173,6 +178,11 @@ export function useTypingGame() {
     getRandomWord()
   }
 
+  const savedHighscore = localStorage.getItem('highscore')
+  if (savedHighscore !== null) {
+    highscore.value = JSON.parse(savedHighscore)
+  }
+
   return {
     currentWord,
     userInput,
@@ -191,5 +201,6 @@ export function useTypingGame() {
     countdownTimer,
     typingInput,
     countdown,
+    highscore,
   }
 }

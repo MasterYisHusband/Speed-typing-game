@@ -23,6 +23,7 @@ const {
   shakeFeedback,
   countdown,
   typingInput,
+  highscore,
 } = useTypingGame()
 
 //localStorage.setItem('test', JSON.stringify(1 + 1))
@@ -56,6 +57,10 @@ const {
       <div class="accuracy">
         <h3>Accuracy</h3>
         <span>{{ accuracy }}%</span>
+        <div class="highscore">
+          <h3>Highscore</h3>
+          <span>{{ highscore }}</span>
+        </div>
       </div>
       <div>
         <div class="history">

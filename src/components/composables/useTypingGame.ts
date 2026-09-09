@@ -1,5 +1,5 @@
 import { isPropertyAccessOrQualifiedName } from 'typescript'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { compileScript } from 'vue/compiler-sfc'
 
 export function useTypingGame() {
@@ -9,6 +9,8 @@ export function useTypingGame() {
   const wpm = ref(0)
   const accuracy = ref(0)
   const timer = ref()
+  const countdownTimer = ref()
+  const countdown = ref(0)
   const isRunning = ref(false)
   const history = ref<{ wpm: number; accuracy: number }[]>([])
   const selectedDifficulty = ref('easy')
@@ -17,6 +19,7 @@ export function useTypingGame() {
   const streak = ref(0)
   const correctFeedback = ref(false)
   const shakeFeedback = ref(false)
+  const typingInput = ref()
 
   async function getRandomWord() {
     let wordLength = 5
@@ -89,30 +92,51 @@ export function useTypingGame() {
     if (isRunning.value === true) {
       return
     }
+
     wpm.value = 0
     wordsTyped.value = 0
     accuracy.value = 0
     correctCharacters.value = 0
     totalCharacters.value = 0
     streak.value = 0
-    isRunning.value = true
+
+    countdown.value = 3
     timeLeft.value = testDuration.value
 
-    timer.value = setInterval(() => {
-      timeLeft.value--
-      if (timeLeft.value === 0) {
-        clearInterval(timer.value)
-        isRunning.value = false
-        wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
+    countdownTimer.value = setInterval(async () => {
+      countdown.value--
 
-        updateAccuracy()
+      if (countdown.value === 0) {
+        clearInterval(countdownTimer.value)
+        isRunning.value = true
 
-        history.value.push({ wpm: wpm.value, accuracy: accuracy.value })
-        timeLeft.value = testDuration.value
-        userInput.value = ''
+        await nextTick()
+        typingInput.value?.focus()
+
+        timer.value = setInterval(() => {
+          timeLeft.value--
+
+          if (timeLeft.value === 0) {
+            clearInterval(timer.value)
+            isRunning.value = false
+
+            wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
+
+            updateAccuracy()
+
+            history.value.push({
+              wpm: wpm.value,
+              accuracy: accuracy.value,
+            })
+
+            timeLeft.value = testDuration.value
+            userInput.value = ''
+          }
+        }, 1000)
       }
     }, 1000)
   }
+  timeLeft.value = testDuration.value
 
   watch(selectedDifficulty, () => {
     if (isRunning.value === false) {
@@ -164,5 +188,8 @@ export function useTypingGame() {
     streak,
     correctFeedback,
     shakeFeedback,
+    countdownTimer,
+    typingInput,
+    countdown,
   }
 }

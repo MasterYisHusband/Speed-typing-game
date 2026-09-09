@@ -21,7 +21,13 @@ const {
   streak,
   correctFeedback,
   shakeFeedback,
+  countdown,
+  typingInput,
 } = useTypingGame()
+
+//localStorage.setItem('test', JSON.stringify(1 + 1))
+//const wert = JSON.parse(localStorage.getItem('test')!)
+//console.log('LocalStorage-Wert, ' + wert)
 </script>
 
 <template>
@@ -31,7 +37,7 @@ const {
         <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
         <div v-if="correctFeedback" class="correct-feedback">✓</div>
       </div>
-      <input v-model="userInput" @input="checkWord" :disabled="!isRunning" />
+      <input ref="typingInput" v-model="userInput" @input="checkWord" :disabled="!isRunning" />
       <div class="buttons">
         <button @click="startGame">START</button>
         <button @click="endGame" :disabled="!isRunning">STOP</button>

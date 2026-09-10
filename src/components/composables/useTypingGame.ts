@@ -10,6 +10,7 @@ export function useTypingGame() {
   const timer = ref()
   const countdownTimer = ref()
   const countdown = ref(0)
+  const showGameOver = ref(false)
   const isRunning = ref(false)
   const history = ref<{ wpm: number; accuracy: number }[]>([])
   const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')

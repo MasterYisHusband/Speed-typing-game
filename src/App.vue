@@ -73,6 +73,7 @@ const {
       <DifficultySelector
         v-model:difficulty="selectedDifficulty"
         v-model:mode="selectedMode"
+        @update:mode="console.log('Dings bekommt:', $event)"
       ></DifficultySelector>
     </div>
   </div>

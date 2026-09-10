@@ -16,6 +16,7 @@ function changeDifficulty(event: Event) {
 
 function changeModi(event: Event) {
   const target = event.target as HTMLSelectElement
+  console.log('Mode im Selector:', target.value)
   emit('update:mode', target.value)
 }
 </script>

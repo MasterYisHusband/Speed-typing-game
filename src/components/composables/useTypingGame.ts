@@ -1,6 +1,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 
 export function useTypingGame() {
+  console.log('useTypingGame läuft')
   const currentWord = ref('')
   const userInput = ref('')
   const wordsTyped = ref(0)
@@ -29,6 +30,7 @@ export function useTypingGame() {
   const wrongWordSound = new Audio('public/sounds/wrong.mp3')
 
   async function getRandomWord() {
+    console.log('getRandomWord läuft')
     let wordLength = 5
 
     if (selectedDifficulty.value === 'medium') {
@@ -38,18 +40,37 @@ export function useTypingGame() {
     if (selectedDifficulty.value === 'difficult') {
       wordLength = 10
     }
+    console.log('vor fetch')
     const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
     const data = await response.json()
     currentWord.value = data[0]
+    console.log(currentWord.value)
   }
 
   async function getRandomText() {
-    const res = await fetch('https://cubsoftware.site/api/lorem?type=sentences&count=2')
-    const data = await res.json()
-    currentWord.value = data.text
+    let minlength = 20
+
+    if (selectedDifficulty.value === 'medium') {
+      minlength = 30
+    }
+
+    if (selectedDifficulty.value === 'difficult') {
+      minlength = 40
+    }
+
+    let data
+
+    do {
+      const res = await fetch('https://dummyjson.com/quotes/random')
+      data = await res.json()
+    } while (data.length < minlength)
+
+    currentWord.value = data.quote
   }
 
   async function getRandomContent() {
+    console.log('getRandomContent läuft')
+    console.log('aktueller Mode:', selectedMode.value)
     if (selectedMode.value === 'word') {
       getRandomWord()
     } else {
@@ -184,7 +205,7 @@ export function useTypingGame() {
 
   watch(selectedMode, () => {
     if (isRunning.value === false) {
-      getRandomContent
+      getRandomContent()
     }
   })
 

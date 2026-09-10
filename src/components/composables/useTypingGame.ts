@@ -19,13 +19,22 @@ export function useTypingGame() {
   const streak = ref(0)
   const correctFeedback = ref(false)
   const shakeFeedback = ref(false)
+  const showEasterEgg = ref(false)
   const typingInput = ref()
   const highscore = ref(0)
   const highscores = ref({
-    easy: 0,
-    medium: 0,
-    difficult: 0,
+    word: {
+      easy: 0,
+      medium: 0,
+      difficult: 0,
+    },
+    text: {
+      easy: 0,
+      medium: 0,
+      difficult: 0,
+    },
   })
+
   const wrongLetterSound = new Audio('public/sounds/wrong.mp3')
   const wrongWordSound = new Audio('public/sounds/wrong.mp3')
 
@@ -106,7 +115,7 @@ export function useTypingGame() {
 
       if (streak.value > highscore.value) {
         highscore.value = streak.value
-        highscores.value[selectedDifficulty.value] = streak.value
+        highscores.value[selectedMode.value][selectedDifficulty.value] = streak.value
         localStorage.setItem('highscores', JSON.stringify(highscores.value))
       }
       correctFeedback.value = true
@@ -201,13 +210,14 @@ export function useTypingGame() {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
       history.value = []
-      highscore.value = highscores.value[selectedDifficulty.value]
+      highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
       getRandomContent()
     }
   })
 
   watch(selectedMode, () => {
     if (isRunning.value === false) {
+      highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
       getRandomContent()
     }
   })
@@ -243,7 +253,7 @@ export function useTypingGame() {
   if (savedHighscores !== null) {
     highscores.value = JSON.parse(savedHighscores)
   }
-  highscore.value = highscores.value[selectedDifficulty.value]
+  highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
 
   const fireSize = computed(() => {
     if (streak.value >= 10) {
@@ -254,6 +264,36 @@ export function useTypingGame() {
       return 'light'
     }
   })
+
+  const konamiCode = [
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'b',
+    'a',
+  ]
+  let konamiIndex = 0
+
+  function checkKonamiCode(event: KeyboardEvent) {
+    if (event.key === konamiCode[konamiIndex]) {
+      konamiIndex++
+
+      if (konamiIndex === konamiCode.length) {
+        console.log('KONAMI CODE AKTIVIERT')
+        showEasterEgg.value = true
+        konamiIndex = 0
+      }
+    } else {
+      konamiIndex = 0
+    }
+  }
+
+  window.addEventListener('keydown', checkKonamiCode)
 
   return {
     currentWord,
@@ -276,5 +316,6 @@ export function useTypingGame() {
     highscore,
     fireSize,
     selectedMode,
+    showEasterEgg,
   }
 }

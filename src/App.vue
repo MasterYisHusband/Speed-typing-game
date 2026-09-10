@@ -25,12 +25,23 @@ const {
   fireSize,
   typingInput,
   selectedMode,
+  showEasterEgg,
 } = useTypingGame()
 //CUB Software Placeholder Text API (für Texte)
 </script>
 
 <template>
   <div class="game">
+    <div v-if="showEasterEgg" class="easter-egg">
+      <iframe
+        width="800"
+        height="450"
+        src="https://www.youtube.com/embed/JaeOZaVsXwU?autoplay=1&controls=0&rel=0"
+        title="Easter Egg"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+    </div>
     <div class="game-area">
       <div class="word-display" :class="{ shake: shakeFeedback }">
         <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
@@ -111,6 +122,20 @@ const {
 .game-area button {
   padding: 10px 25px;
   font-size: 16px;
+}
+
+.easter-egg {
+  position: fixed;
+  top: 30%;
+  right: 5%;
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+}
+
+.easter-egg iframe {
+  border: none;
 }
 
 .stats {

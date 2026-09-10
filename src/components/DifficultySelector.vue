@@ -34,8 +34,8 @@ function changeModi(event: Event) {
     <div class="ModeSelectOrdner">
       <p>Mode:</p>
       <select :value="props.mode" @change="changeModi">
-        <option value="word">Wörter</option>
-        <option value="text">Texte</option>
+        <option value="word">Words</option>
+        <option value="text">Texts</option>
       </select>
     </div>
   </div>

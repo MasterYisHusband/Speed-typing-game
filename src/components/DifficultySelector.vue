@@ -1,27 +1,64 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: string
+  difficulty: string
+  mode: string
 }>()
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', difficulty: string): void
+  (event: 'update:difficulty', difficulty: string): void
+  (event: 'update:mode', mode: string): void
 }>()
 
 function changeDifficulty(event: Event) {
   const target = event.target as HTMLSelectElement
-  emit('update:modelValue', target.value)
+  emit('update:difficulty', target.value)
+}
+
+function changeModi(event: Event) {
+  const target = event.target as HTMLSelectElement
+  emit('update:mode', target.value)
 }
 </script>
 
 <template>
-  <select :value="props.modelValue" @change="changeDifficulty">
-    <option value="easy">Easy</option>
-    <option value="medium">Medium</option>
-    <option value="difficult">Difficult</option>
-  </select>
+  <div class="selectorContainer">
+    <div class="DifficultySelectOrdner">
+      <p>Difficulty:</p>
+      <select :value="props.difficulty" @change="changeDifficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="difficult">Difficult</option>
+      </select>
+    </div>
+    <div class="ModeSelectOrdner">
+      <p>Mode:</p>
+      <select :value="props.mode" @change="changeModi">
+        <option value="word">Wörter</option>
+        <option value="text">Texte</option>
+      </select>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.DifficultySelectOrdner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ModeSelectOrdner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.selectorContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 select {
   width: 250px;
   height: 45px;

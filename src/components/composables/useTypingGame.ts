@@ -12,6 +12,7 @@ export function useTypingGame() {
   const isRunning = ref(false)
   const history = ref<{ wpm: number; accuracy: number }[]>([])
   const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')
+  const selectedMode = ref<'word' | 'text'>('word')
   const correctCharacters = ref(0)
   const totalCharacters = ref(0)
   const streak = ref(0)
@@ -37,12 +38,25 @@ export function useTypingGame() {
     if (selectedDifficulty.value === 'difficult') {
       wordLength = 10
     }
-
     const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
     const data = await response.json()
     currentWord.value = data[0]
   }
-  getRandomWord()
+
+  async function getRandomText() {
+    const res = await fetch('https://cubsoftware.site/api/lorem?type=sentences&count=2')
+    const data = await res.json()
+    currentWord.value = data.text
+  }
+
+  async function getRandomContent() {
+    if (selectedMode.value === 'word') {
+      getRandomWord()
+    } else {
+      getRandomText()
+    }
+  }
+  getRandomContent()
 
   function checkWord() {
     const input = userInput.value
@@ -168,6 +182,12 @@ export function useTypingGame() {
     }
   })
 
+  watch(selectedMode, () => {
+    if (isRunning.value === false) {
+      getRandomContent
+    }
+  })
+
   const difficultyselected = computed(() => {
     if (selectedDifficulty.value === 'easy') {
       return '--easy-difficulty'
@@ -231,5 +251,6 @@ export function useTypingGame() {
     countdown,
     highscore,
     fireSize,
+    selectedMode,
   }
 }

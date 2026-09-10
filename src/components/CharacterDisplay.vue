@@ -28,6 +28,9 @@ const props = defineProps<{
   gap: 5px;
   font-size: 30px;
   position: relative;
+  white-space: pre;
+  max-width: 1600px;
+  flex-wrap: wrap;
 }
 
 .arrow {

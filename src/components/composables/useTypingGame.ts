@@ -49,15 +49,15 @@ export function useTypingGame() {
 
   async function getRandomText() {
     let minlength = 20
-    let maxlength = 60
+    let maxlength = 50
 
     if (selectedDifficulty.value === 'medium') {
-      minlength = 61
-      maxlength = 120
+      minlength = 70
+      maxlength = 110
     }
 
     if (selectedDifficulty.value === 'difficult') {
-      minlength = 121
+      minlength = 130
       maxlength = 180
     }
 
@@ -66,7 +66,7 @@ export function useTypingGame() {
     do {
       const res = await fetch('https://dummyjson.com/quotes/random')
       data = await res.json()
-    } while (data.length < minlength || data.length > maxlength)
+    } while (data.quote.length < minlength || data.quote.length > maxlength)
 
     currentWord.value = data.quote
   }

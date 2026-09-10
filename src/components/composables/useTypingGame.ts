@@ -49,13 +49,16 @@ export function useTypingGame() {
 
   async function getRandomText() {
     let minlength = 20
+    let maxlength = 60
 
     if (selectedDifficulty.value === 'medium') {
-      minlength = 30
+      minlength = 61
+      maxlength = 120
     }
 
     if (selectedDifficulty.value === 'difficult') {
-      minlength = 40
+      minlength = 121
+      maxlength = 180
     }
 
     let data
@@ -63,7 +66,7 @@ export function useTypingGame() {
     do {
       const res = await fetch('https://dummyjson.com/quotes/random')
       data = await res.json()
-    } while (data.length < minlength)
+    } while (data.length < minlength || data.length > maxlength)
 
     currentWord.value = data.quote
   }
@@ -110,7 +113,7 @@ export function useTypingGame() {
       setTimeout(() => {
         correctFeedback.value = false
       }, 500)
-      getRandomWord()
+      getRandomContent()
       userInput.value = ''
     }
 
@@ -199,7 +202,7 @@ export function useTypingGame() {
       timeLeft.value = testDuration.value
       history.value = []
       highscore.value = highscores.value[selectedDifficulty.value]
-      getRandomWord()
+      getRandomContent()
     }
   })
 
@@ -233,7 +236,7 @@ export function useTypingGame() {
     history.value.push({ wpm: wpm.value, accuracy: accuracy.value })
     timeLeft.value = testDuration.value
     userInput.value = ''
-    getRandomWord()
+    getRandomContent()
   }
 
   const savedHighscores = localStorage.getItem('highscores')

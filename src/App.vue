@@ -24,11 +24,8 @@ const {
   highscore,
   fireSize,
   typingInput,
+  selectedMode,
 } = useTypingGame()
-
-//localStorage.setItem('test', JSON.stringify(1 + 1))
-//const wert = JSON.parse(localStorage.getItem('test')!)
-//console.log('LocalStorage-Wert, ' + wert)
 //CUB Software Placeholder Text API (für Texte)
 </script>
 
@@ -73,7 +70,10 @@ const {
       </div>
     </div>
     <div class="difficulty">
-      <DifficultySelector v-model="selectedDifficulty"></DifficultySelector>
+      <DifficultySelector
+        v-model:difficulty="selectedDifficulty"
+        v-model:mode="selectedMode"
+      ></DifficultySelector>
     </div>
   </div>
 </template>

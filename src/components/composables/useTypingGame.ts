@@ -188,6 +188,10 @@ export function useTypingGame() {
           if (timeLeft.value === 0) {
             clearInterval(timer.value)
             isRunning.value = false
+            showGameOver.value = true
+            setTimeout(() => {
+              showGameOver.value = false
+            }, 4000)
 
             wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
 
@@ -318,5 +322,6 @@ export function useTypingGame() {
     fireSize,
     selectedMode,
     showEasterEgg,
+    showGameOver,
   }
 }

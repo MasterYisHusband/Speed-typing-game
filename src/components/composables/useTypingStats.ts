@@ -39,6 +39,12 @@ export function useTypingStats() {
     })
   }
 
+  function finishStats(elapsedTime: number) {
+    calculateWpm(elapsedTime)
+    updateAccuracy()
+    addHistoryEntry()
+  }
+
   function clearHistory() {
     history.value = []
   }
@@ -49,6 +55,7 @@ export function useTypingStats() {
     if (isCorrect) {
       correctCharacters.value++
     }
+    updateAccuracy()
   }
 
   function recordWord() {
@@ -69,5 +76,6 @@ export function useTypingStats() {
     clearHistory,
     recordCharacters,
     recordWord,
+    finishStats,
   }
 }

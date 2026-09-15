@@ -27,6 +27,7 @@ export function useTypingGame() {
     clearHistory,
     recordCharacters,
     recordWord,
+    finishStats,
   } = useTypingStats()
   const { highscore, updateHighscore, loadCurrentHighscore } = useHighscore()
   const userInput = ref('')
@@ -64,10 +65,7 @@ export function useTypingGame() {
   const { countdown, timeLeft, startCountdown, startTimer, stopTimer } = useGameTimer(testDuration)
 
   function finishGame(elapsedTime: number) {
-    calculateWpm(elapsedTime)
-    updateAccuracy()
-    addHistoryEntry()
-
+    finishStats(elapsedTime)
     timeLeft.value = testDuration.value
     userInput.value = ''
   }
@@ -95,13 +93,17 @@ export function useTypingGame() {
     })
   }
 
-  watch(selectedDifficulty, () => {
+  function updateGameSettings() {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
       clearHistory()
       loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
       getRandomContent()
     }
+  }
+
+  watch(selectedDifficulty, () => {
+    updateGameSettings()
   })
 
   watch(selectedMode, () => {

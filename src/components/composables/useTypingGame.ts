@@ -121,6 +121,11 @@ export function useTypingGame() {
     }
   })
 
+  const progress = computed(() => {
+    if (testDuration.value === 0) return 0
+    return ((testDuration.value - timeLeft.value) / testDuration.value) * 100
+  })
+
   return {
     currentWord,
     userInput,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TimerDisplay from './TimerDisplay.vue'
+import { getWpmLevel } from './utils/wpmLevel.ts'
 
 type HistoryEntry = {
   wpm: number
@@ -40,7 +41,7 @@ defineProps<{
     <div class="history">
       <div v-for="(round, index) in history" :key="index" class="history-entry">
         <span>Round {{ index + 1 }}</span>
-        <span>{{ round.wpm }} WPM</span>
+        <span>{{ round.wpm }} WPM ({{ getWpmLevel(round.wpm) }})</span>
         <span>{{ round.accuracy }}% Accuracy</span>
       </div>
     </div>

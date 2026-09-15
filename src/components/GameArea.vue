@@ -2,6 +2,7 @@
 import { ref, watch, nextTick } from 'vue'
 import CharacterDisplay from './CharacterDisplay.vue'
 import { PhFire } from '@phosphor-icons/vue'
+import ProgressBar from './ProgressBar.vue'
 
 const props = defineProps<{
   currentWord: string
@@ -11,8 +12,11 @@ const props = defineProps<{
   correctFeedback: boolean
   countdown: number
   streak: number
+  progress: number
   fireSize: 'light' | 'bold' | 'fill'
 }>()
+
+console.log('GameArea props:', props)
 
 const inputElement = ref<HTMLInputElement | null>(null)
 
@@ -40,13 +44,13 @@ const emit = defineEmits<{
 
       <div v-if="correctFeedback" class="correct-feedback">✓</div>
     </div>
+
     <input
       ref="inputElement"
       :value="userInput"
       @input="emit('input', ($event.target as HTMLInputElement).value)"
       :disabled="!isRunning"
     />
-
     <div class="buttons">
       <button @click="emit('start')">START</button>
       <button @click="emit('end')" :disabled="!isRunning">STOP</button>
@@ -56,6 +60,8 @@ const emit = defineEmits<{
       <PhFire class="icon" :size="30" :weight="fireSize" />
       {{ streak }}
     </div>
+    <p>DEBUG: {{ progress }}</p>
+    <ProgressBar :progress="progress" />
   </div>
 </template>
 

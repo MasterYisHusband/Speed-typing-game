@@ -27,12 +27,15 @@ const {
   showEasterEgg,
   showGameOver,
   checkWord,
+  progress,
 } = useTypingGame()
 
 function handleInput(value: string) {
   userInput.value = value
   checkWord()
 }
+
+console.log('App progress:', progress)
 </script>
 
 <template>
@@ -47,6 +50,7 @@ function handleInput(value: string) {
       :countdown="countdown"
       :streak="streak"
       :fire-size="fireSize"
+      :progress="progress"
       @input="handleInput"
       @start="startGame"
       @end="endGame"

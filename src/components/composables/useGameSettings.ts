@@ -7,7 +7,7 @@ export function useGameSettings() {
   const selectedDifficulty = ref<Difficulty>('easy')
   const selectedMode = ref<Mode>('word')
 
-  const testDuration = computed(() => {
+  const testDuration = computed<number>(() => {
     if (selectedDifficulty.value === 'easy') {
       return 180
     } else if (selectedDifficulty.value === 'medium') {

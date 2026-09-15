@@ -1,22 +1,34 @@
 import { ref, computed, watch, nextTick } from 'vue'
+import { useGameContent } from './useGameContent'
+import { useTypingStats } from './useTypingStats'
 
 export function useTypingGame() {
   console.log('useTypingGame läuft')
-  const currentWord = ref('')
+  const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')
+  const selectedMode = ref<'word' | 'text'>('word')
+  const { currentWord, getRandomContent } = useGameContent(selectedDifficulty, selectedMode)
+  getRandomContent()
+  const {
+    wordsTyped,
+    wpm,
+    accuracy,
+    correctCharacters,
+    totalCharacters,
+    updateAccuracy,
+    calculateWpm,
+    resetStats,
+    history,
+    addHistoryEntry,
+    clearHistory,
+    recordCharacters,
+    recordWord,
+  } = useTypingStats()
   const userInput = ref('')
-  const wordsTyped = ref(0)
-  const wpm = ref(0)
-  const accuracy = ref(0)
   const timer = ref()
   const countdownTimer = ref()
   const countdown = ref(0)
   const showGameOver = ref(false)
   const isRunning = ref(false)
-  const history = ref<{ wpm: number; accuracy: number }[]>([])
-  const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')
-  const selectedMode = ref<'word' | 'text'>('word')
-  const correctCharacters = ref(0)
-  const totalCharacters = ref(0)
   const streak = ref(0)
   const correctFeedback = ref(false)
   const shakeFeedback = ref(false)
@@ -36,80 +48,23 @@ export function useTypingGame() {
     },
   })
 
-  const wrongLetterSound = new Audio('public/sounds/wrong.mp3')
-  const wrongWordSound = new Audio('public/sounds/wrong.mp3')
-
-  async function getRandomWord() {
-    console.log('getRandomWord läuft')
-    let wordLength = 5
-
-    if (selectedDifficulty.value === 'medium') {
-      wordLength = 7
-    }
-
-    if (selectedDifficulty.value === 'difficult') {
-      wordLength = 10
-    }
-    console.log('vor fetch')
-    const response = await fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
-    const data = await response.json()
-    currentWord.value = data[0]
-    console.log(currentWord.value)
-  }
-
-  async function getRandomText() {
-    let minlength = 20
-    let maxlength = 50
-
-    if (selectedDifficulty.value === 'medium') {
-      minlength = 70
-      maxlength = 110
-    }
-
-    if (selectedDifficulty.value === 'difficult') {
-      minlength = 130
-      maxlength = 180
-    }
-
-    let data
-
-    do {
-      const res = await fetch('https://dummyjson.com/quotes/random')
-      data = await res.json()
-    } while (data.quote.length < minlength || data.quote.length > maxlength)
-
-    currentWord.value = data.quote
-  }
-
-  async function getRandomContent() {
-    console.log('getRandomContent läuft')
-    console.log('aktueller Mode:', selectedMode.value)
-    if (selectedMode.value === 'word') {
-      getRandomWord()
-    } else {
-      getRandomText()
-    }
-  }
-  getRandomContent()
-
   function checkWord() {
     const input = userInput.value
     if (input.length > totalCharacters.value % currentWord.value.length) {
       const index = input.length - 1
       const typedCharacter = input[index]
       const correctCharacter = currentWord.value[index]
-      totalCharacters.value++
-      if (typedCharacter === correctCharacter) {
-        correctCharacters.value++
-      } else {
+      const isCorrect = typedCharacter === correctCharacter
+      recordCharacters(isCorrect)
+      if (!isCorrect) {
         streak.value = 0
         shakeFeedback.value = true
-        wrongLetterSound.play()
         setTimeout(() => {
           shakeFeedback.value = false
         }, 500)
       }
     }
+
     if (currentWord.value === userInput.value) {
       wordsTyped.value++
       streak.value++
@@ -131,18 +86,9 @@ export function useTypingGame() {
       userInput.value.length === currentWord.value.length &&
       currentWord.value !== userInput.value
     ) {
-      wrongWordSound.play()
     }
 
     updateAccuracy()
-  }
-
-  function updateAccuracy() {
-    if (totalCharacters.value === 0) {
-      accuracy.value = 0
-      return
-    }
-    accuracy.value = Math.round((correctCharacters.value / totalCharacters.value) * 100)
   }
 
   const testDuration = computed(() => {
@@ -161,12 +107,7 @@ export function useTypingGame() {
     if (isRunning.value === true) {
       return
     }
-
-    wpm.value = 0
-    wordsTyped.value = 0
-    accuracy.value = 0
-    correctCharacters.value = 0
-    totalCharacters.value = 0
+    resetStats()
     streak.value = 0
 
     countdown.value = 3
@@ -193,14 +134,9 @@ export function useTypingGame() {
               showGameOver.value = false
             }, 4000)
 
-            wpm.value = Math.ceil(wordsTyped.value / (testDuration.value / 60))
-
+            calculateWpm(testDuration.value)
             updateAccuracy()
-
-            history.value.push({
-              wpm: wpm.value,
-              accuracy: accuracy.value,
-            })
+            addHistoryEntry()
 
             timeLeft.value = testDuration.value
             userInput.value = ''
@@ -214,7 +150,7 @@ export function useTypingGame() {
   watch(selectedDifficulty, () => {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
-      history.value = []
+      clearHistory()
       highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
       getRandomContent()
     }
@@ -241,14 +177,9 @@ export function useTypingGame() {
     clearInterval(timer.value)
     isRunning.value = false
     const elapsedTime = testDuration.value - timeLeft.value
-    if (elapsedTime > 0) {
-      wpm.value = Math.ceil(wordsTyped.value / (elapsedTime / 60))
-    } else {
-      wpm.value = 0
-    }
+    calculateWpm(elapsedTime)
     updateAccuracy()
-
-    history.value.push({ wpm: wpm.value, accuracy: accuracy.value })
+    addHistoryEntry()
     timeLeft.value = testDuration.value
     userInput.value = ''
     getRandomContent()

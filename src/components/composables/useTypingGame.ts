@@ -9,26 +9,11 @@ import { useGameSettings } from './useGameSettings'
 import { useTypingFeedback } from './useTypingFeedback'
 
 export function useTypingGame() {
-  console.log('useTypingGame läuft')
   const { selectedDifficulty, selectedMode, testDuration, difficultyselected } = useGameSettings()
   const { currentWord, getRandomContent } = useGameContent(selectedDifficulty, selectedMode)
   getRandomContent()
-  const {
-    wordsTyped,
-    wpm,
-    accuracy,
-    correctCharacters,
-    totalCharacters,
-    updateAccuracy,
-    calculateWpm,
-    resetStats,
-    history,
-    addHistoryEntry,
-    clearHistory,
-    recordCharacters,
-    recordWord,
-    finishStats,
-  } = useTypingStats()
+  const { accuracy, resetStats, history, clearHistory, recordCharacters, recordWord, finishStats } =
+    useTypingStats()
   const { highscore, updateHighscore, loadCurrentHighscore } = useHighscore()
   const userInput = ref('')
   const { isRunning, showGameOver, showGameOverScreen } = useGameSession()
@@ -37,10 +22,11 @@ export function useTypingGame() {
   const { correctFeedback, shakeFeedback, showCorrectFeedback, showShakeFeedback } =
     useTypingFeedback()
   const typingInput = ref()
+  const lastInputLength = ref(0)
 
   function checkWord() {
     const input = userInput.value
-    if (input.length > totalCharacters.value % currentWord.value.length) {
+    if (input.length > lastInputLength.value) {
       const index = input.length - 1
       const typedCharacter = input[index]
       const correctCharacter = currentWord.value[index]
@@ -58,8 +44,11 @@ export function useTypingGame() {
         showCorrectFeedback()
         getRandomContent()
         userInput.value = ''
+        lastInputLength.value = 0
+        return
       }
     }
+    lastInputLength.value = input.length
   }
 
   const { countdown, timeLeft, startCountdown, startTimer, stopTimer } = useGameTimer(testDuration)
@@ -68,16 +57,18 @@ export function useTypingGame() {
     finishStats(elapsedTime)
     timeLeft.value = testDuration.value
     userInput.value = ''
+    lastInputLength.value = 0
   }
 
   function startGame() {
-    if (isRunning.value === true) {
+    if (isRunning.value) {
       return
     }
 
     resetStats()
     streak.value = 0
     timeLeft.value = testDuration.value
+    lastInputLength.value = 0
 
     startCountdown(async () => {
       isRunning.value = true
@@ -94,7 +85,7 @@ export function useTypingGame() {
   }
 
   function updateGameSettings() {
-    if (isRunning.value === false) {
+    if (!isRunning.value) {
       timeLeft.value = testDuration.value
       clearHistory()
       loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
@@ -102,12 +93,10 @@ export function useTypingGame() {
     }
   }
 
-  watch(selectedDifficulty, () => {
-    updateGameSettings()
-  })
+  watch(selectedDifficulty, updateGameSettings)
 
   watch(selectedMode, () => {
-    if (isRunning.value === false) {
+    if (!isRunning.value) {
       loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
       getRandomContent()
     }

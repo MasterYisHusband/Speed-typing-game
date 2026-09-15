@@ -4,6 +4,7 @@ import CharacterDisplay from './components/CharacterDisplay.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { useTypingGame } from './components/composables/useTypingGame.ts'
 import { PhFire } from '@phosphor-icons/vue'
+import StatsPanel from './components/StatsPanel.vue'
 
 const {
   currentWord,
@@ -55,49 +56,39 @@ const {
       </div>
       <div class="streak"><PhFire class="icon" :size="30" :weight="fireSize" /> {{ streak }}</div>
     </div>
-    <div class="stats">
-      <h2>Stats</h2>
-      <div class="timer">
-        <h3>Timer:</h3>
-        <TimerDisplay :time-left="timeLeft"></TimerDisplay>
-      </div>
-      <div class="difficultyselected" :style="{ color: `var(${difficultyselected})` }">
-        <h2>{{ selectedDifficulty }}</h2>
-      </div>
-      <div class="accuracy">
-        <h3>Accuracy</h3>
-        <span>{{ accuracy }}%</span>
-        <h3>Highscore</h3>
-        <span>{{ highscore }}</span>
-      </div>
-      <div>
-        <div class="history">
-          <div v-for="(Round, index) in history" :key="index" class="history-entry">
-            <span>Round {{ index + 1 }}</span>
-            <span>{{ Round.wpm }} WPM</span>
-            <span>{{ Round.accuracy }}% Accuracy</span>
-          </div>
-        </div>
+    <StatsPanel
+      :time-left="timeLeft"
+      :selected-difficulty="selectedDifficulty"
+      :difficultyselected="difficultyselected"
+      :accuracy="accuracy"
+      :highscore="highscore"
+      :history="history"
+    />
+    <div class="history">
+      <div v-for="(Round, index) in history" :key="index" class="history-entry">
+        <span>Round {{ index + 1 }}</span>
+        <span>{{ Round.wpm }} WPM</span>
+        <span>{{ Round.accuracy }}% Accuracy</span>
       </div>
     </div>
-    <div class="difficulty">
-      <DifficultySelector
-        v-model:difficulty="selectedDifficulty"
-        v-model:mode="selectedMode"
-        @update:mode="console.log('Dings bekommt:', $event)"
-      ></DifficultySelector>
-    </div>
-    <div v-if="showGameOver" class="game-over">
-      <div class="game-over-popup">
-        <h1>GAME OVER</h1>
-        <iframe
-          width="800"
-          height="450"
-          src="https://www.youtube.com/embed/JHXxpDQRVxk?autoplay=1&start=3&end=7&controls=0&rel=0"
-          title="mmaaAAAaah"
-          allow="autoplay; encrypted-media"
-        ></iframe>
-      </div>
+  </div>
+  <div class="difficulty">
+    <DifficultySelector
+      v-model:difficulty="selectedDifficulty"
+      v-model:mode="selectedMode"
+      @update:mode="console.log('Dings bekommt:', $event)"
+    ></DifficultySelector>
+  </div>
+  <div v-if="showGameOver" class="game-over">
+    <div class="game-over-popup">
+      <h1>GAME OVER</h1>
+      <iframe
+        width="800"
+        height="450"
+        src="https://www.youtube.com/embed/JHXxpDQRVxk?autoplay=1&start=3&end=7&controls=0&rel=0"
+        title="mmaaAAAaah"
+        allow="autoplay; encrypted-media"
+      ></iframe>
     </div>
   </div>
 </template>
@@ -180,49 +171,6 @@ const {
   border: none;
 }
 
-.stats {
-  grid-area: stats;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 20px;
-
-  background-color: whitesmoke;
-  border-radius: 15px;
-  padding: 20px;
-  margin: 20px;
-  color: black;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-
-  min-height: 0;
-  overflow: hidden;
-}
-
-.stats h2 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.accuracy {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-}
-
-.timer {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 15px;
-  border: 2px solid #333;
-  border-radius: 10px;
-  text-align: center;
-  background-color: white;
-}
-
 .countdown {
   font-size: 30px;
   font-weight: bold;
@@ -243,33 +191,6 @@ const {
   justify-content: center;
   align-items: center;
   padding-bottom: 15px;
-}
-
-.difficultyselected h2 {
-  display: grid;
-  grid-area: inherit;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-}
-
-.history {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-height: 700px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.history-entry {
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: 2px solid red;
 }
 
 .word-display {

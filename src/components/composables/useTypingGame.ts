@@ -1,11 +1,16 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useGameContent } from './useGameContent'
 import { useTypingStats } from './useTypingStats'
+import { useGameTimer } from './useGameTimer'
+import { useKonamiCode } from './useKonamiCode'
+import { useHighscore } from './useHighscore'
+import { useGameSession } from './useGameSession'
+import { useGameSettings } from './useGameSettings'
+import { useTypingFeedback } from './useTypingFeedback'
 
 export function useTypingGame() {
   console.log('useTypingGame läuft')
-  const selectedDifficulty = ref<'easy' | 'medium' | 'difficult'>('easy')
-  const selectedMode = ref<'word' | 'text'>('word')
+  const { selectedDifficulty, selectedMode, testDuration, difficultyselected } = useGameSettings()
   const { currentWord, getRandomContent } = useGameContent(selectedDifficulty, selectedMode)
   getRandomContent()
   const {
@@ -23,30 +28,14 @@ export function useTypingGame() {
     recordCharacters,
     recordWord,
   } = useTypingStats()
+  const { highscore, updateHighscore, loadCurrentHighscore } = useHighscore()
   const userInput = ref('')
-  const timer = ref()
-  const countdownTimer = ref()
-  const countdown = ref(0)
-  const showGameOver = ref(false)
-  const isRunning = ref(false)
+  const { isRunning, showGameOver, showGameOverScreen } = useGameSession()
+  const { showEasterEgg } = useKonamiCode()
   const streak = ref(0)
-  const correctFeedback = ref(false)
-  const shakeFeedback = ref(false)
-  const showEasterEgg = ref(false)
+  const { correctFeedback, shakeFeedback, showCorrectFeedback, showShakeFeedback } =
+    useTypingFeedback()
   const typingInput = ref()
-  const highscore = ref(0)
-  const highscores = ref({
-    word: {
-      easy: 0,
-      medium: 0,
-      difficult: 0,
-    },
-    text: {
-      easy: 0,
-      medium: 0,
-      difficult: 0,
-    },
-  })
 
   function checkWord() {
     const input = userInput.value
@@ -58,138 +47,82 @@ export function useTypingGame() {
       recordCharacters(isCorrect)
       if (!isCorrect) {
         streak.value = 0
-        shakeFeedback.value = true
-        setTimeout(() => {
-          shakeFeedback.value = false
-        }, 500)
+        showShakeFeedback()
+      }
+
+      if (currentWord.value === userInput.value) {
+        recordWord()
+        streak.value++
+        updateHighscore(selectedMode.value, selectedDifficulty.value, streak.value)
+        showCorrectFeedback()
+        getRandomContent()
+        userInput.value = ''
       }
     }
-
-    if (currentWord.value === userInput.value) {
-      wordsTyped.value++
-      streak.value++
-
-      if (streak.value > highscore.value) {
-        highscore.value = streak.value
-        highscores.value[selectedMode.value][selectedDifficulty.value] = streak.value
-        localStorage.setItem('highscores', JSON.stringify(highscores.value))
-      }
-      correctFeedback.value = true
-      setTimeout(() => {
-        correctFeedback.value = false
-      }, 500)
-      getRandomContent()
-      userInput.value = ''
-    }
-
-    if (
-      userInput.value.length === currentWord.value.length &&
-      currentWord.value !== userInput.value
-    ) {
-    }
-
-    updateAccuracy()
   }
 
-  const testDuration = computed(() => {
-    if (selectedDifficulty.value === 'easy') {
-      return 180
-    } else if (selectedDifficulty.value === 'medium') {
-      return 120
-    } else {
-      return 60
-    }
-  })
+  const { countdown, timeLeft, startCountdown, startTimer, stopTimer } = useGameTimer(testDuration)
 
-  const timeLeft = ref(testDuration.value)
+  function finishGame(elapsedTime: number) {
+    calculateWpm(elapsedTime)
+    updateAccuracy()
+    addHistoryEntry()
+
+    timeLeft.value = testDuration.value
+    userInput.value = ''
+  }
 
   function startGame() {
     if (isRunning.value === true) {
       return
     }
+
     resetStats()
     streak.value = 0
-
-    countdown.value = 3
     timeLeft.value = testDuration.value
 
-    countdownTimer.value = setInterval(async () => {
-      countdown.value--
+    startCountdown(async () => {
+      isRunning.value = true
 
-      if (countdown.value === 0) {
-        clearInterval(countdownTimer.value)
-        isRunning.value = true
+      await nextTick()
+      typingInput.value?.focus()
 
-        await nextTick()
-        typingInput.value?.focus()
-
-        timer.value = setInterval(() => {
-          timeLeft.value--
-
-          if (timeLeft.value === 0) {
-            clearInterval(timer.value)
-            isRunning.value = false
-            showGameOver.value = true
-            setTimeout(() => {
-              showGameOver.value = false
-            }, 4000)
-
-            calculateWpm(testDuration.value)
-            updateAccuracy()
-            addHistoryEntry()
-
-            timeLeft.value = testDuration.value
-            userInput.value = ''
-          }
-        }, 1000)
-      }
-    }, 1000)
+      startTimer(() => {
+        isRunning.value = false
+        showGameOverScreen()
+        finishGame(testDuration.value)
+      })
+    })
   }
-  timeLeft.value = testDuration.value
 
   watch(selectedDifficulty, () => {
     if (isRunning.value === false) {
       timeLeft.value = testDuration.value
       clearHistory()
-      highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
+      loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
       getRandomContent()
     }
   })
 
   watch(selectedMode, () => {
     if (isRunning.value === false) {
-      highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
+      loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
       getRandomContent()
     }
   })
 
-  const difficultyselected = computed(() => {
-    if (selectedDifficulty.value === 'easy') {
-      return '--easy-difficulty'
-    } else if (selectedDifficulty.value === 'medium') {
-      return '--medium-difficulty'
-    } else {
-      return '--difficult-difficulty'
-    }
-  })
-
   function endGame() {
-    clearInterval(timer.value)
+    stopTimer()
     isRunning.value = false
+
     const elapsedTime = testDuration.value - timeLeft.value
-    calculateWpm(elapsedTime)
-    updateAccuracy()
-    addHistoryEntry()
-    timeLeft.value = testDuration.value
-    userInput.value = ''
+
+    finishGame(elapsedTime)
+
     getRandomContent()
   }
 
-  const savedHighscores = localStorage.getItem('highscores')
-  if (savedHighscores !== null) {
-    highscores.value = JSON.parse(savedHighscores)
-  }
-  highscore.value = highscores.value[selectedMode.value][selectedDifficulty.value]
+  loadCurrentHighscore(selectedMode.value, selectedDifficulty.value)
 
   const fireSize = computed(() => {
     if (streak.value >= 10) {
@@ -200,36 +133,6 @@ export function useTypingGame() {
       return 'light'
     }
   })
-
-  const konamiCode = [
-    'ArrowUp',
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
-    'ArrowLeft',
-    'ArrowRight',
-    'b',
-    'a',
-  ]
-  let konamiIndex = 0
-
-  function checkKonamiCode(event: KeyboardEvent) {
-    if (event.key === konamiCode[konamiIndex]) {
-      konamiIndex++
-
-      if (konamiIndex === konamiCode.length) {
-        console.log('KONAMI CODE AKTIVIERT')
-        showEasterEgg.value = true
-        konamiIndex = 0
-      }
-    } else {
-      konamiIndex = 0
-    }
-  }
-
-  window.addEventListener('keydown', checkKonamiCode)
 
   return {
     currentWord,
@@ -246,7 +149,6 @@ export function useTypingGame() {
     streak,
     correctFeedback,
     shakeFeedback,
-    countdownTimer,
     typingInput,
     countdown,
     highscore,

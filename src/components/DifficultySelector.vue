@@ -1,23 +1,25 @@
 <script setup lang="ts">
+type Difficulty = 'easy' | 'medium' | 'difficult'
+type Mode = 'word' | 'text'
+
 const props = defineProps<{
-  difficulty: string
-  mode: string
+  difficulty: Difficulty
+  mode: Mode
 }>()
 
 const emit = defineEmits<{
-  (event: 'update:difficulty', difficulty: string): void
-  (event: 'update:mode', mode: string): void
+  (event: 'update:difficulty', difficulty: Difficulty): void
+  (event: 'update:mode', mode: Mode): void
 }>()
 
 function changeDifficulty(event: Event) {
   const target = event.target as HTMLSelectElement
-  emit('update:difficulty', target.value)
+  emit('update:difficulty', target.value as Difficulty)
 }
 
 function changeModi(event: Event) {
   const target = event.target as HTMLSelectElement
-  console.log('Mode im Selector:', target.value)
-  emit('update:mode', target.value)
+  emit('update:mode', target.value as Mode)
 }
 </script>
 

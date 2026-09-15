@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import DifficultySelector from './components/DifficultySelector.vue'
-import CharacterDisplay from './components/CharacterDisplay.vue'
-import TimerDisplay from './components/TimerDisplay.vue'
 import { useTypingGame } from './components/composables/useTypingGame.ts'
-import { PhFire } from '@phosphor-icons/vue'
 import StatsPanel from './components/StatsPanel.vue'
+import GameOverPopup from './components/GameOverPopup.vue'
+import EasterEgg from './components/EasterEgg.vue'
+import GameArea from './components/GameArea.vue'
+import GameSettings from './components/GameSettings.vue'
 
 const {
   currentWord,
@@ -12,7 +12,6 @@ const {
   isRunning,
   history,
   selectedDifficulty,
-  checkWord,
   timeLeft,
   startGame,
   endGame,
@@ -24,38 +23,34 @@ const {
   countdown,
   highscore,
   fireSize,
-  typingInput,
   selectedMode,
   showEasterEgg,
   showGameOver,
+  checkWord,
 } = useTypingGame()
+
+function handleInput(value: string) {
+  userInput.value = value
+  checkWord()
+}
 </script>
 
 <template>
   <div class="game">
-    <div v-if="showEasterEgg" class="easter-egg">
-      <iframe
-        width="800"
-        height="450"
-        src="https://www.youtube.com/embed/JaeOZaVsXwU?autoplay=1&controls=0&rel=0"
-        title="Easter Egg"
-        allow="autoplay; encrypted-media"
-        allowfullscreen
-      ></iframe>
-    </div>
-    <div class="game-area">
-      <div class="word-display" :class="{ shake: shakeFeedback }">
-        <CharacterDisplay :current-word="currentWord" :user-input="userInput"></CharacterDisplay>
-        <div v-if="correctFeedback" class="correct-feedback">✓</div>
-      </div>
-      <input ref="typingInput" v-model="userInput" @input="checkWord" :disabled="!isRunning" />
-      <div class="buttons">
-        <button @click="startGame">START</button>
-        <button @click="endGame" :disabled="!isRunning">STOP</button>
-        <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
-      </div>
-      <div class="streak"><PhFire class="icon" :size="30" :weight="fireSize" /> {{ streak }}</div>
-    </div>
+    <EasterEgg :show="showEasterEgg" />
+    <GameArea
+      :current-word="currentWord"
+      :user-input="userInput"
+      :is-running="isRunning"
+      :shake-feedback="shakeFeedback"
+      :correct-feedback="correctFeedback"
+      :countdown="countdown"
+      :streak="streak"
+      :fire-size="fireSize"
+      @input="handleInput"
+      @start="startGame"
+      @end="endGame"
+    />
     <StatsPanel
       :time-left="timeLeft"
       :selected-difficulty="selectedDifficulty"
@@ -64,33 +59,9 @@ const {
       :highscore="highscore"
       :history="history"
     />
-    <div class="history">
-      <div v-for="(Round, index) in history" :key="index" class="history-entry">
-        <span>Round {{ index + 1 }}</span>
-        <span>{{ Round.wpm }} WPM</span>
-        <span>{{ Round.accuracy }}% Accuracy</span>
-      </div>
-    </div>
+    <GameSettings v-model:difficulty="selectedDifficulty" v-model:mode="selectedMode" />
   </div>
-  <div class="difficulty">
-    <DifficultySelector
-      v-model:difficulty="selectedDifficulty"
-      v-model:mode="selectedMode"
-      @update:mode="console.log('Dings bekommt:', $event)"
-    ></DifficultySelector>
-  </div>
-  <div v-if="showGameOver" class="game-over">
-    <div class="game-over-popup">
-      <h1>GAME OVER</h1>
-      <iframe
-        width="800"
-        height="450"
-        src="https://www.youtube.com/embed/JHXxpDQRVxk?autoplay=1&start=3&end=7&controls=0&rel=0"
-        title="mmaaAAAaah"
-        allow="autoplay; encrypted-media"
-      ></iframe>
-    </div>
-  </div>
+  <GameOverPopup :show="showGameOver" />
 </template>
 
 <style scoped>
@@ -105,159 +76,5 @@ const {
   gap: 20px;
   height: 100vh;
   width: 100%;
-}
-
-.game-area {
-  grid-area: game;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.game-area input {
-  width: 400px;
-  height: 45px;
-  font-size: 30px;
-}
-
-.game-area button {
-  padding: 10px 25px;
-  font-size: 16px;
-}
-
-.easter-egg {
-  position: fixed;
-  top: 30%;
-  right: 5%;
-  width: 100%;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-}
-
-.easter-egg iframe {
-  border: none;
-}
-
-.game-over {
-  position: fixed;
-  top: 30%;
-  right: 8%;
-  width: 100%;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-}
-
-.game-over-popup {
-  background-color: color-mix(in srgb, darkgray 10%, black 90%);
-  border: 1px solid red;
-  border-radius: 18px;
-  padding: 20px;
-  color: red;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-.game-over-popup h1 {
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.game-over-popup iframe {
-  border: none;
-}
-
-.countdown {
-  font-size: 30px;
-  font-weight: bold;
-  position: absolute;
-  right: -30px;
-}
-
-.buttons {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-}
-
-.difficulty {
-  grid-area: difficulty;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 15px;
-}
-
-.word-display {
-  display: flex;
-  align-items: center;
-  gap: 40px;
-  position: relative;
-}
-
-@keyframes correct-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-}
-
-.correct-feedback {
-  animation: correct-pop 1000ms;
-  color: var(--correct-word);
-  font-weight: bold;
-  position: absolute;
-  right: -30px;
-}
-
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-
-  20% {
-    transform: translateX(-10px);
-  }
-
-  40% {
-    transform: translateX(10px);
-  }
-
-  60% {
-    transform: translateX(-10px);
-  }
-
-  80% {
-    transform: translateX(10px);
-  }
-
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.shake {
-  animation: shake 500ms;
-}
-
-.streak {
-  font-size: 25px;
-}
-
-.icon {
-  color: orange;
 }
 </style>

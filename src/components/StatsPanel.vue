@@ -19,26 +19,30 @@ defineProps<{
 <template>
   <div class="stats">
     <h2>Stats</h2>
-  </div>
-  <div class="timer">
-    <h3>Timer:</h3>
-    <TimerDisplay :time-left="timeLeft" />
-  </div>
-  <div class="difficultyselected" :style="{ color: `var(${difficultyselected})` }">
-    <h2>{{ selectedDifficulty }}</h2>
-  </div>
-  <div class="accuracy">
-    <h3>Accuracy</h3>
-    <span>{{ accuracy }}</span>
 
-    <h3>Highscore</h3>
-    <span>{{ highscore }}</span>
-  </div>
-  <div class="history">
-    <div v-for="(round, index) in history" :key="index" class="history-entry">
-      <span>Round {{ index + 1 }}</span>
-      <span>{{ round.wpm }} WPM</span>
-      <span>{{ round.accuracy }}% Accuracy</span>
+    <div class="timer">
+      <h3>Timer:</h3>
+      <TimerDisplay :time-left="timeLeft" />
+    </div>
+
+    <div class="difficultyselected" :style="{ color: `var(${difficultyselected})` }">
+      <h2>{{ selectedDifficulty }}</h2>
+    </div>
+
+    <div class="accuracy">
+      <h3>Accuracy</h3>
+      <span>{{ accuracy }}%</span>
+
+      <h3>Highscore</h3>
+      <span>{{ highscore }}</span>
+    </div>
+
+    <div class="history">
+      <div v-for="(round, index) in history" :key="index" class="history-entry">
+        <span>Round {{ index + 1 }}</span>
+        <span>{{ round.wpm }} WPM</span>
+        <span>{{ round.accuracy }}% Accuracy</span>
+      </div>
     </div>
   </div>
 </template>

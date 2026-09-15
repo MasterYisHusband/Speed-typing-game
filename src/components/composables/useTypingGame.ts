@@ -21,7 +21,6 @@ export function useTypingGame() {
   const streak = ref(0)
   const { correctFeedback, shakeFeedback, showCorrectFeedback, showShakeFeedback } =
     useTypingFeedback()
-  const typingInput = ref()
   const lastInputLength = ref(0)
 
   function checkWord() {
@@ -72,9 +71,6 @@ export function useTypingGame() {
 
     startCountdown(async () => {
       isRunning.value = true
-
-      await nextTick()
-      typingInput.value?.focus()
 
       startTimer(() => {
         isRunning.value = false
@@ -140,7 +136,6 @@ export function useTypingGame() {
     streak,
     correctFeedback,
     shakeFeedback,
-    typingInput,
     countdown,
     highscore,
     fireSize,
